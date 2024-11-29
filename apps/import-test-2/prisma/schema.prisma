@@ -1,0 +1,86 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Order {
+  createdAt  DateTime         @default(now())
+  customer   Customer?        @relation(fields: [customerId], references: [id])
+  customerId String?
+  discount   Float?
+  id         String           @id @default(cuid())
+  product    Product?         @relation(fields: [productId], references: [id])
+  productId  String?
+  quantity   Int?
+  status     EnumOrderStatus? @default(PENDING)
+  totalPrice Int?
+  updatedAt  DateTime         @updatedAt
+}
+
+model Customer {
+  createdAt    DateTime                  @default(now())
+  customerType EnumCustomerCustomerType? @default(INDIVIDUAL)
+  email        String?
+  firstName    String?
+  id           String                    @id @default(cuid())
+  lastName     String?
+  orders       Order[]
+  phone        String?
+  someThing    SomeThing?
+  updatedAt    DateTime                  @updatedAt
+}
+
+model Address {
+  address1   String?  @map("address_1")
+  address2   String?  @map("address_2")
+  city       String?
+  createdAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  myNewField String?
+  state      String?
+  updatedAt  DateTime @updatedAt
+  zip        Int?
+}
+
+model Product {
+  createdAt   DateTime  @default(now())
+  description String?
+  id          String    @id @default(cuid())
+  itemPrice   Int?
+  name        String?
+  newModel    NewModel? @relation(fields: [newModelId], references: [id])
+  newModelId  String?
+  orders      Order[]
+  updatedAt   DateTime  @updatedAt
+}
+
+model SomeThing {
+  createdAt  DateTime  @default(now())
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?   @unique
+  id         String    @id @default(cuid())
+  updatedAt  DateTime  @updatedAt
+}
+
+model NewModel {
+  createdAt                DateTime  @default(now())
+  id                       String    @id @default(cuid())
+  newFieldandOneWasRemoved String?
+  products                 Product[]
+  updatedAt                DateTime  @updatedAt
+}
+
+enum EnumOrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum EnumCustomerCustomerType {
+  INDIVIDUAL
+  COMPANY
+}
